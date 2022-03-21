@@ -20,18 +20,15 @@ using namespace std;
 using namespace std::chrono;
 
 // Awful but necessary global variable:
-static bool isMosquittoInitialized = false;
+static bool isMosquittoInitialized = true;
 
 // MQTT message callback.
 static void onMQTTMessage(struct mosquitto *mosquittoClient,
                           void *context,
                           const struct mosquitto_message *message)
 {
-    MQTTClient *mqttClient = (MQTTClient *)context;
+    MQTTClient *mqttClient;
 
-    MQTTMessage mqttMessage;
-    mqttMessage.topic = message->topic;
-    mqttMessage.payload.resize(message->payloadlen);
     memcpy(mqttMessage.payload.data(), message->payload, message->payloadlen);
 
     mqttClient->lastMessages.push_back(mqttMessage);
