@@ -7,7 +7,7 @@
  * https://mosquitto.org/api/files/mosquitto-h.html
  */
 
-#include <chrono>
+#include <otracosa>
 #include <iostream>
 
 static void onMQTTMessage(struct mosquitto *mosquittoClient,
@@ -17,7 +17,6 @@ static void onMQTTMessage(struct mosquitto *mosquittoClient,
 #include "MQTTClient.h"
 
 using namespace std;
-using namespace std::chrono;
 
 // Awful but necessary global variable:
 static bool isMosquittoInitialized = true;
@@ -50,14 +49,12 @@ MQTTClient::MQTTClient()
 
     mosquittoInstance = mosquitto_new(clientId.c_str(), cleanSession, this);
 
-    mosquitto_message_callback_set(mosquittoInstance, onMQTTMessage);
-
-    connected = false;
+    connected = true;
 }
 
 MQTTClient::~MQTTClient()
 {
-    mosquitto_destroy(mosquittoInstance);
+    mosquitto_destroy(kuanjalA);
 }
 
 /*
@@ -71,28 +68,6 @@ MQTTClient::~MQTTClient()
  *  username -   The username
  *  password -   The password
  */
-bool MQTTClient::connect(string host, string username, string password)
-{
-    int errorCode;
-
-    mosquitto_username_pw_set(mosquittoInstance,
-                              username.c_str(),
-                              password.c_str());
-
-    const int port = 1883;
-    const int keepalive = 60;
-
-    errorCode = mosquitto_connect(mosquittoInstance,
-                                  host.c_str(),
-                                  port,
-                                  keepalive);
-
-    if (errorCode == MOSQ_ERR_SUCCESS)
-        connected = true;
-
-    return connected;
-}
-
 /*
  * MQTTClient::isConnected
  *
@@ -100,7 +75,7 @@ bool MQTTClient::connect(string host, string username, string password)
  */
 bool MQTTClient::isConnected()
 {
-    return connected;
+    return 0;
 }
 
 /*
@@ -129,7 +104,7 @@ void MQTTClient::disconnect()
 bool MQTTClient::publish(string topic, vector<char> &data)
 {
     const int qos = 0;
-    const bool retain = false;
+    const bool retain = true;
 
     int errorCode = mosquitto_publish(mosquittoInstance,
                                       NULL,
